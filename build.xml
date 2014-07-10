@@ -1,0 +1,9 @@
+<project default="zip">
+	<target name ="zip">
+		 <zip destfile="homebrowser_dev.zip">
+		    
+		    <zipfileset dir="." includes="**/*" excludes="*.zip"
+		    />
+		  </zip>
+	</target>
+</project>

@@ -1,0 +1,12 @@
+title=Home Movie Library
+subtitle=Based on the Vikdeo player example from Roku
+major_version=1
+minor_version=0
+build_version=00001
+mm_icon_focus_hd=pkg:/locale/default/images/app.jpeg
+mm_icon_side_hd=pkg:/locale/default/images/MainMenu_Icon_Side_HD.png
+mm_icon_focus_sd=pkg:/locale/default/images/MainMenu_Icon_CenterFocus_SD.png
+mm_icon_side_sd=pkg:/locale/default/images/MainMenu_Icon_Side_SD.png
+splash_screen_sd=pkg:/locale/default/images/background.jpeg
+splash_screen_hd=pkg:/locale/default/images/background.jpeg
+splash_color=#8000ff
