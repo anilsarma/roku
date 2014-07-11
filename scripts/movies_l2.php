@@ -16,7 +16,7 @@ $dir      = $home_user."/$subdir";
     $port  =$_SERVER['SERVER_PORT'];
     $context = $_SERVER['CONTEXT_PREFIX'];
     
-    if( isset($ip) && isset($port) && isset($context) )
+    if( isset($ip) && isset($port) )
     {
 	if( $port == "80" )
 	{
@@ -26,18 +26,29 @@ $dir      = $home_user."/$subdir";
 	{
 	    $port =":$port";
 	}
-	$context = preg_replace('/\/$/', '', $context);
-	$context = preg_replace('/^\//', '', $context);
-	$url_user = "http://$ip$port/$context";
-	$context = preg_replace('/^~/', '', $context);
+	$tmp=$_SERVER["CONTEXT_DOCUMENT_ROOT"];
+	if( isset($tmp))
+	{
+	    $home_user = $tmp;
+	}
 	
-	$home_user="/home/$context/public_html";
+	if( isset($context) )
+	{
+	    $context = preg_replace('/\/$/', '', $context);
+	    $context = preg_replace('/^\//', '', $context);
+	    $url_user = "http://$ip$port/$context";	    
+	}
+    }
+    $tmp_dir = $_GET["dir"];
+    if(isset($tmp_dir) )
+    {
+	$subdir = $tmp_dir;
     }
    # echo "IP=$ip home=$home_user\n";
     
 }
 
-function generate_item( $id, $movie_dir, $movie_file, $poster, $streamFormat, $imdb, $time )
+function generate_item( $id, $movie_dir, $movie_file, $poster, $streamFormat, $imdb, $time, $series )
 {
     global $url_user, $home_user, $subdir;
     # use only the name of the directory.
@@ -62,15 +73,62 @@ function generate_item( $id, $movie_dir, $movie_file, $poster, $streamFormat, $i
     echo "           <contentType>movie</contentType>\n"; 
     echo "           <contentQuality>HD</contentQuality>\n";
     echo "           <streamFormat>$streamFormat</streamFormat>\n";
-    echo "           <SDBifUrl>$url_user/$subdir/$movie_dir_basename/trick-SD.bif</SDBifUrl>\n";
-    echo "           <HDBifUrl>$url_user/$subdir/$movie_dir_basename/trick-SD.bif</HDBifUrl>\n";
 
-    $movie_dir_srt = glob("$movie_dir/*.{srt}", GLOB_BRACE);
-    if( count($movie_dir_srt)>0)
-    {
-	$srt = basename( $movie_dir_srt[0] );
-	echo "           <SubTitleUrl>$url_user/$subdir/$movie_dir_basename/$srt</SubTitleUrl>\n";
+   
+    if( $series == 0 )
+    { 
+	$movie_bif = glob("$movie_dir/*.{bif}", GLOB_BRACE);
+	if( count($movie_bif)>1)
+	{
+	    foreach ($movie_bif as $bif_path )
+	    {
+		$bif = basename( $bif_path );
+		if( preg_match("/\SD/i",  $bif_path ) )
+		{
+		    echo "           <SDBifUrl>$url_user/$subdir/$movie_dir_basename/$bif</SDBifUrl>\n";
+		}
+		else
+		{
+		    echo "           <HDBifUrl>$url_user/$subdir/$movie_dir_basename/$bif</HDBifUrl>\n";
+		}
+	    }
+	}
+	else if( count($movie_bif)==1)
+	{	
+	    echo "           <SDBifUrl>$url_user/$subdir/$movie_dir_basename/", basename($bif_path[0]), "</SDBifUrl>\n";
+	    echo "           <HDBifUrl>$url_user/$subdir/$movie_dir_basename/", basename($bif_path[0]), "</HDBifUrl>\n";
+	}
+
+	$movie_dir_srt = glob("$movie_dir/*.{srt}", GLOB_BRACE);
+	if( count($movie_dir_srt)>0)
+	{
+	    $srt = basename( $movie_dir_srt[0] );
+	    echo "           <SubTitleUrl>$url_user/$subdir/$movie_dir_basename/$srt</SubTitleUrl>\n";
+	}
     }
+    else
+    {
+	# check for matching name, that is the only way we can identify the 
+	$name = preg_replace ('/\.[^.]+$/', '', $movie_file );
+	echo "NAME=$name\n"; 
+	$movie_bif = glob("$movie_dir/*$name*.{bif}", GLOB_BRACE);
+	foreach ($movie_bif as $bif_path )
+	{
+	    echo "BIf $bif_path\n";
+	    $bif = basename( $bif_path );
+	    echo "           <SDBifUrl>$url_user/$subdir/$movie_dir_basename/", $bif, "</SDBifUrl>\n";
+	    echo "           <HDBifUrl>$url_user/$subdir/$movie_dir_basename/", $bif, "</HDBifUrl>\n";
+	    break;
+	}
+	$movie_dir_srt = glob("$movie_dir/*$name*.{srt}", GLOB_BRACE);
+	if( count($movie_dir_srt)>0)
+	{
+	    $srt = basename( $movie_dir_srt[0] );
+	    echo "           <SubTitleUrl>$url_user/$subdir/$movie_dir_basename/$srt</SubTitleUrl>\n";
+	}
+    }
+
+    
     echo "           <media>\n";
     echo "              <streamFormat>$streamFormat</streamFormat>\n";
     echo "              <streamQuality>HD</streamQuality>\n";
@@ -135,7 +193,12 @@ function generate_item( $id, $movie_dir, $movie_file, $poster, $streamFormat, $i
 		{
 		    $title = "";
 		}
+		$series = 0;
 		if( count($movie_dir_contents)>1 )
+		{
+		    $series = 1;
+		}
+		if( $series )
 		{
 		    echo "    <itemSeries  title=\"", $title, "\" adImg=\"$url_user/$subdir/$file/$title\" ";
 		    echo " hdImg=\"$url_user/$subdir/$file/$title\" >\n";
@@ -164,10 +227,10 @@ function generate_item( $id, $movie_dir, $movie_file, $poster, $streamFormat, $i
 		    }	    
 		    $id = $id + 1;
 		  
-		    generate_item( $id, $movie_dir, $movie_file, $poster, $streamFormat, $imdb, $tstotal );	
+		    generate_item( $id, $movie_dir, $movie_file, $poster, $streamFormat, $imdb, $tstotal, $series );	
 		        		
 		}
-		if( count($movie_dir_contents)>1 )
+		if( $series )
 		{
 		    echo "    </itemSeries>\n";
 		}	
