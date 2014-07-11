@@ -49,20 +49,6 @@ Makefile - Optional method of building the application
            convenience and tested on OSX and linux.
 
 
-Note: The xml and artwork directories are NOT part of the application
-      package, but can be saved as an archive using the "make archive"
-      target. The makefile also can push the development app directly
-      to the device if "make" and "curl" are available. See the comments
-      in the Makefile for more information.
-
-      **************************************************
-
-This example uses videos streamed directly from the TED Talks 
-website (www.ted.com). Please visit the TED website to see the
-full lineup of talks made available by TED. 
-
-Please see the following for license details:
-http://creativecommons.org/licenses/by-nc-nd/3.0/
 
 
 
