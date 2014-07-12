@@ -221,9 +221,9 @@ function generate_item( $id, $movie_dir, $movie_file, $poster, $streamFormat, $i
 			$cmd =  "mkvinfo '$movie_file_path'  | grep Duration| perl -ne '/(\d+\.\d+)s/ && print $1'\n";
 			$tstotal = shell_exec( $cmd );
 		    }
-		    else if( preg_match("/\.hls/i",  $movie_file ) )
+		    else if( preg_match("/\.m3u8/i",  $movie_file ) )
 		    { 
-			$streamFormat= "mkv";
+			$streamFormat= "hls";
 			$tstotal = count(glob("$movie_dir/*.ts", GLOB_BRACE))  * 10;
 		    }	    
 		    $id = $id + 1;
