@@ -11,6 +11,7 @@ header("Content-Type: text/plain\n");
   
   <category title="Movies" description="Auto Public Movies" sd_img="" hd_img="http://192.168.1.12/~as64720/movies/home_movies.jpeg">
     <categoryLeaf title="Movies" description="" feed="http://192.168.1.12/~as64720/php-bin/movies_l2.php"/>
+    <categoryLeaf title="Songs" description="" feed="http://192.168.1.12/~as64720/php-bin/movies_l2.php?dir=songs"/>
   </category>
 
   <!--category title="Movies" description="Public Movies" sd_img="" hd_img="http://192.168.1.12/~as64720/movies/home_movies.jpeg">

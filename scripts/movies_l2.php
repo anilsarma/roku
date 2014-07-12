@@ -67,7 +67,7 @@ function generate_item( $id, $movie_dir, $movie_file, $poster, $streamFormat, $i
     }
     else
     {
-	echo "           <title>$movie_dir_basename</title>\n"; 
+	echo "           <title>$movie_file</title>\n"; 
 	echo "           <contentId>$id</contentId>\n"; 
     }
     echo "           <contentType>movie</contentType>\n"; 
@@ -95,8 +95,8 @@ function generate_item( $id, $movie_dir, $movie_file, $poster, $streamFormat, $i
 	}
 	else if( count($movie_bif)==1)
 	{	
-	    echo "           <SDBifUrl>$url_user/$subdir/$movie_dir_basename/", basename($bif_path[0]), "</SDBifUrl>\n";
-	    echo "           <HDBifUrl>$url_user/$subdir/$movie_dir_basename/", basename($bif_path[0]), "</HDBifUrl>\n";
+	    echo "           <SDBifUrl>$url_user/$subdir/$movie_dir_basename/", basename($movie_bif[0]), "</SDBifUrl>\n";
+	    echo "           <HDBifUrl>$url_user/$subdir/$movie_dir_basename/", basename($movie_bif[0]), "</HDBifUrl>\n";
 	}
 
 	$movie_dir_srt = glob("$movie_dir/*.{srt}", GLOB_BRACE);
@@ -110,11 +110,11 @@ function generate_item( $id, $movie_dir, $movie_file, $poster, $streamFormat, $i
     {
 	# check for matching name, that is the only way we can identify the 
 	$name = preg_replace ('/\.[^.]+$/', '', $movie_file );
-	echo "NAME=$name\n"; 
+	#echo "NAME=$name\n"; 
 	$movie_bif = glob("$movie_dir/*$name*.{bif}", GLOB_BRACE);
 	foreach ($movie_bif as $bif_path )
 	{
-	    echo "BIf $bif_path\n";
+	    #echo "BIf $bif_path\n";
 	    $bif = basename( $bif_path );
 	    echo "           <SDBifUrl>$url_user/$subdir/$movie_dir_basename/", $bif, "</SDBifUrl>\n";
 	    echo "           <HDBifUrl>$url_user/$subdir/$movie_dir_basename/", $bif, "</HDBifUrl>\n";
@@ -218,7 +218,8 @@ function generate_item( $id, $movie_dir, $movie_file, $poster, $streamFormat, $i
 		    else if( preg_match("/\.mkv/i",  $movie_file ) )
 		    { 
 			$streamFormat= "mkv";
-			$tstotal = 0;
+			$cmd =  "mkvinfo '$movie_file_path'  | grep Duration| perl -ne '/(\d+\.\d+)s/ && print $1'\n";
+			$tstotal = shell_exec( $cmd );
 		    }
 		    else if( preg_match("/\.hls/i",  $movie_file ) )
 		    { 
